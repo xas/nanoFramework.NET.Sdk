@@ -4,9 +4,9 @@
 //
 
 // ProcessResourceFiles has a field of type TaskLoggingHelper
-// (Microsoft.Build.Utilities.Core). On net8.0 that NuGet package ships only a
+// (Microsoft.Build.Utilities.Core). On net10.0 that NuGet package ships only a
 // reference assembly (no runtime lib), so instantiating ProcessResourceFiles fails
-// at test-run time. The cross-platform components it exercises on net8.0
+// at test-run time. The cross-platform components it exercises on net10.0
 // (NanoResxResourceReader, CrossPlatformBitmap) are covered directly by the other
 // test files. These integration tests therefore run on net472 only.
 #if NETFRAMEWORK

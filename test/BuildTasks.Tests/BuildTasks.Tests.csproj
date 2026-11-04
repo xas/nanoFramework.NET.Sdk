@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net472</TargetFrameworks>
+    <TargetFrameworks>net10.0;net472</TargetFrameworks>
     <RootNamespace>nanoFramework.Tools.BuildTasks.Tests</RootNamespace>
     <AssemblyName>nanoFramework.Tools.BuildTasks.Tests</AssemblyName>
     <IsPackable>false</IsPackable>
@@ -26,8 +26,8 @@
     net472 needs:
       - Windows-only framework refs (same as the BuildTasks project)
       - Microsoft.Build.Utilities.Core at runtime (provides the runtime lib for net472;
-        the net8.0 NuGet variant ships only a reference assembly, so ProcessResourceFilesTests
-        is guarded with #if NETFRAMEWORK and skipped on net8.0)
+        the net10.0 NuGet variant ships only a reference assembly, so ProcessResourceFilesTests
+        is guarded with #if NETFRAMEWORK and skipped on net10.0)
   -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="System.Drawing" />

@@ -2,7 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-// Cross-platform (net8.0+) companion for ProcessResourceFiles.
+// Cross-platform (net10.0+) companion for ProcessResourceFiles.
 //
 // On .NET Framework the resource pipeline relies on System.Windows.Forms
 // (ResXResourceReader) and System.Drawing (GDI+) which are Windows-only and

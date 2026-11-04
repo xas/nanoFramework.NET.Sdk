@@ -17,7 +17,7 @@ namespace nanoFramework.Tools.BuildTasks.Tests
 {
     /// <summary>
     /// Unit tests for <see cref="NanoResxResourceReader"/>, the cross-platform
-    /// (net8.0+) .resx parser used in place of
+    /// (net10.0+) .resx parser used in place of
     /// <c>System.Resources.ResXResourceReader</c> (WinForms / net472 only).
     /// </summary>
     [TestClass]

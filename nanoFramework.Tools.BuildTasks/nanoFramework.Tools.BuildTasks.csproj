@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net472</TargetFrameworks>
+    <TargetFrameworks>net10.0;net472</TargetFrameworks>
     <RootNamespace>nanoFramework.Tools</RootNamespace>
     <AssemblyName>nanoFramework.Tools.BuildTasks</AssemblyName>
     <GenerateDocumentationFile>false</GenerateDocumentationFile>
@@ -40,7 +40,7 @@
   -->
   <ItemGroup Condition="'$(TargetFramework)' != 'net472'">
     <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
-    <PackageReference Include="System.CodeDom" Version="8.0.0" />
+    <PackageReference Include="System.CodeDom" Version="10.0.14" />
   </ItemGroup>
 
   <!--

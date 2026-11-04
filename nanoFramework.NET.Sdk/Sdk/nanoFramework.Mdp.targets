@@ -105,7 +105,7 @@
   <!--  Build task declarations                                     -->
   <!-- ============================================================ -->
   <PropertyGroup>
-    <_NanoBuildTasksDir Condition="'$(MSBuildRuntimeType)' == 'Core'">$(_NanoSdkRoot)tasks\net8.0\</_NanoBuildTasksDir>
+    <_NanoBuildTasksDir Condition="'$(MSBuildRuntimeType)' == 'Core'">$(_NanoSdkRoot)tasks\net10.0\</_NanoBuildTasksDir>
     <_NanoBuildTasksDir Condition="'$(MSBuildRuntimeType)' != 'Core'">$(_NanoSdkRoot)tasks\net472\</_NanoBuildTasksDir>
   </PropertyGroup>
 
@@ -121,7 +121,8 @@
 
   <!-- MetadataProcessor — resolve the task DLL from NuGet package or env var override -->
   <PropertyGroup>
-    <!-- Determine MDP task TFM based on MSBuild runtime. MDP 4.x ships net8.0 (Core) + net472. -->
+    <!-- Determine MDP task TFM based on MSBuild runtime. MDP 4.x ships net8.0 (Core) + net472;
+         the net8.0 task loads in .NET 10 MSBuild. Independent of this SDK's own task TFM. -->
     <_NanoMdpTasksTfm Condition="'$(MSBuildRuntimeType)' == 'Core'">net8.0</_NanoMdpTasksTfm>
     <_NanoMdpTasksTfm Condition="'$(_NanoMdpTasksTfm)' == ''">net472</_NanoMdpTasksTfm>
     <!-- Resolve MDP task directory from NuGet package using GeneratePathProperty -->

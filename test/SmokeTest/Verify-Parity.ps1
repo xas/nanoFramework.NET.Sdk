@@ -99,7 +99,7 @@ $tempRoot = Join-Path ([System.IO.Path]::GetTempPath()) ("nf-smoketest-parity-" 
 $null = New-Item -ItemType Directory -Path $tempRoot -Force
 
 try {
-    $coreCapture = Join-Path $tempRoot 'net8.0'
+    $coreCapture = Join-Path $tempRoot 'net10.0'
     $frameworkCapture = Join-Path $tempRoot 'net472'
     $null = New-Item -ItemType Directory -Path $coreCapture -Force
     $null = New-Item -ItemType Directory -Path $frameworkCapture -Force
@@ -113,7 +113,7 @@ try {
     $coreNames = @($coreFiles.Name)
     $frameworkNames = @($frameworkFiles.Name)
     if (@(Compare-Object -ReferenceObject $coreNames -DifferenceObject $frameworkNames).Count -ne 0) {
-        throw "Parity check failed: generated .nanoresources file sets differ.`nnet8.0 : $($coreNames -join ', ')`nnet472 : $($frameworkNames -join ', ')"
+        throw "Parity check failed: generated .nanoresources file sets differ.`nnet10.0 : $($coreNames -join ', ')`nnet472 : $($frameworkNames -join ', ')"
     }
 
     $mismatches = @()
@@ -125,7 +125,7 @@ try {
         $frameworkHash = Get-FileHash -LiteralPath $frameworkPath -Algorithm SHA256
 
         Write-Host "$name"
-        Write-Host "  net8.0:  $($coreHash.Hash)"
+        Write-Host "  net10.0:  $($coreHash.Hash)"
         Write-Host "  net472:  $($frameworkHash.Hash)"
 
         if ($coreHash.Hash -ne $frameworkHash.Hash) {
@@ -137,7 +137,7 @@ try {
         throw "Parity check failed: hash mismatch in .nanoresources files: $($mismatches -join ', ')"
     }
 
-    Write-Host 'Parity check passed: all .nanoresources files are byte-identical for net8.0 and net472.'
+    Write-Host 'Parity check passed: all .nanoresources files are byte-identical for net10.0 and net472.'
 }
 finally {
     if (Test-Path -LiteralPath $tempRoot) {

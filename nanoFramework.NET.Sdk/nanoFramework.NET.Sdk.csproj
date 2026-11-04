@@ -53,7 +53,7 @@
     calls GetTargetPath on the outer cross-targeting build and fails with MSB4057.
   -->
   <ItemGroup>
-    <ProjectReference Include="..\nanoFramework.Tools.BuildTasks\nanoFramework.Tools.BuildTasks.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" SetTargetFramework="TargetFramework=net8.0" />
+    <ProjectReference Include="..\nanoFramework.Tools.BuildTasks\nanoFramework.Tools.BuildTasks.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" SetTargetFramework="TargetFramework=net10.0" />
     <ProjectReference Include="..\nanoFramework.Tools.BuildTasks\nanoFramework.Tools.BuildTasks.csproj" ReferenceOutputAssembly="false" SkipGetTargetFrameworkProperties="true" SetTargetFramework="TargetFramework=net472" />
   </ItemGroup>
 
@@ -72,7 +72,7 @@
       tasks/
         net472/
           nanoFramework.Tools.BuildTasks.dll
-        net8.0/
+        net10.0/
           nanoFramework.Tools.BuildTasks.dll
       README.md
   -->
@@ -105,12 +105,12 @@
     <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net472\nanoFramework.Tools.BuildTasks.pdb" Pack="true" PackagePath="tasks\net472" Condition="Exists('..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net472\nanoFramework.Tools.BuildTasks.pdb')" />
 
     <!-- Build task DLLs for dotnet CLI MSBuild -->
-    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net8.0\nanoFramework.Tools.BuildTasks.dll" Pack="true" PackagePath="tasks\net8.0" />
-    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net8.0\nanoFramework.Tools.BuildTasks.pdb" Pack="true" PackagePath="tasks\net8.0" Condition="Exists('..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net8.0\nanoFramework.Tools.BuildTasks.pdb')" />
+    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\nanoFramework.Tools.BuildTasks.dll" Pack="true" PackagePath="tasks\net10.0" />
+    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\nanoFramework.Tools.BuildTasks.pdb" Pack="true" PackagePath="tasks\net10.0" Condition="Exists('..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\nanoFramework.Tools.BuildTasks.pdb')" />
 
-    <!-- Cross-platform resource-processing dependencies, loaded alongside the net8.0 task DLL -->
-    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net8.0\SixLabors.ImageSharp.dll" Pack="true" PackagePath="tasks\net8.0" />
-    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net8.0\System.CodeDom.dll" Pack="true" PackagePath="tasks\net8.0" />
+    <!-- Cross-platform resource-processing dependencies, loaded alongside the net10.0 task DLL -->
+    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\SixLabors.ImageSharp.dll" Pack="true" PackagePath="tasks\net10.0" />
+    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\System.CodeDom.dll" Pack="true" PackagePath="tasks\net10.0" />
 
     <!-- Package README -->
     <None Include="..\README.md" Pack="true" PackagePath="" />
