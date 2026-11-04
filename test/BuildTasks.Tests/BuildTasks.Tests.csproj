@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net10.0;net472</TargetFrameworks>
+    <!-- net472 tests need .NET Framework (Windows); elsewhere vstest would require mono. -->
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(TargetFrameworks);net472</TargetFrameworks>
     <RootNamespace>nanoFramework.Tools.BuildTasks.Tests</RootNamespace>
     <AssemblyName>nanoFramework.Tools.BuildTasks.Tests</AssemblyName>
     <IsPackable>false</IsPackable>
