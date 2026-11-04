@@ -15,7 +15,7 @@
     <PackageReference Include="MSTest.TestAdapter" Version="4.5.2" />
     <PackageReference Include="MSTest.TestFramework" Version="4.5.2" />
     <!-- Microsoft.Build.Framework provides ITaskItem, IBuildEngine used in test infrastructure -->
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.28" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="18.0.2" />
   </ItemGroup>
 
   <ItemGroup>
@@ -32,7 +32,7 @@
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
   </ItemGroup>
 
 </Project>
