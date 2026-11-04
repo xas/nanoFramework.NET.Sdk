@@ -1,7 +1,9 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFrameworks>net8.0;net472</TargetFrameworks>
+    <!-- net472 tests need .NET Framework (Windows); elsewhere vstest would require mono. -->
+    <TargetFrameworks>net10.0</TargetFrameworks>
+    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('Windows'))">$(TargetFrameworks);net472</TargetFrameworks>
     <RootNamespace>nanoFramework.Tools.BuildTasks.Tests</RootNamespace>
     <AssemblyName>nanoFramework.Tools.BuildTasks.Tests</AssemblyName>
     <IsPackable>false</IsPackable>
@@ -11,28 +13,24 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.11.1" />
-    <PackageReference Include="MSTest.TestAdapter" Version="3.6.3" />
-    <PackageReference Include="MSTest.TestFramework" Version="3.6.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.11.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="4.5.2" />
+    <PackageReference Include="MSTest.TestFramework" Version="4.5.2" />
     <!-- Microsoft.Build.Framework provides ITaskItem, IBuildEngine used in test infrastructure -->
-    <PackageReference Include="Microsoft.Build.Framework" Version="17.14.28" />
+    <PackageReference Include="Microsoft.Build.Framework" Version="18.0.2" />
+    <!-- Runtime lib for ProcessResourceFiles (TaskLoggingHelper field); the build task
+         itself references it compile-only, since MSBuild provides it at build time -->
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\nanoFramework.Tools.BuildTasks\nanoFramework.Tools.BuildTasks.csproj" />
   </ItemGroup>
 
-  <!--
-    net472 needs:
-      - Windows-only framework refs (same as the BuildTasks project)
-      - Microsoft.Build.Utilities.Core at runtime (provides the runtime lib for net472;
-        the net8.0 NuGet variant ships only a reference assembly, so ProcessResourceFilesTests
-        is guarded with #if NETFRAMEWORK and skipped on net8.0)
-  -->
+  <!-- net472 needs the Windows-only framework refs (same as the BuildTasks project) -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="17.14.28" />
   </ItemGroup>
 
 </Project>

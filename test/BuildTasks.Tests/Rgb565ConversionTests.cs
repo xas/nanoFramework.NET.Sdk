@@ -15,7 +15,7 @@ namespace nanoFramework.Tools.BuildTasks.Tests
 {
     /// <summary>
     /// Unit tests for <see cref="CrossPlatformBitmap"/>: validates that the
-    /// ImageSharp-backed RGB565 converter produces the correct 16-bit pixel values
+    /// SkiaSharp-backed RGB565 converter produces the correct 16-bit pixel values
     /// for known input colours, and that bitmap format detection works correctly.
     /// </summary>
     [TestClass]

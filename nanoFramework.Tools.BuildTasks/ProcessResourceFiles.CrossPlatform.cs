@@ -2,7 +2,7 @@
 // Copyright (c) .NET Foundation and Contributors
 // See LICENSE file in the project root for full license information.
 //
-// Cross-platform (net8.0+) companion for ProcessResourceFiles.
+// Cross-platform (net10.0+) companion for ProcessResourceFiles.
 //
 // On .NET Framework the resource pipeline relies on System.Windows.Forms
 // (ResXResourceReader) and System.Drawing (GDI+) which are Windows-only and
@@ -12,7 +12,7 @@
 //   * NanoResxResourceReader - a focused .resx reader covering the cases the
 //     nanoFramework pipeline uses (inline strings, ResXFileRef linked files read
 //     as string or raw bytes whatever type they declare, and base64 byte-array blobs).
-//   * CrossPlatformBitmap - bitmap decoding + RGB565 conversion via ImageSharp,
+//   * CrossPlatformBitmap - bitmap decoding + RGB565 conversion via SkiaSharp,
 //     producing the exact CLR_GFX_BitmapDescription + payload the nanoCLR expects.
 //
 
@@ -25,9 +25,7 @@ using System.IO;
 using System.Resources;
 using System.Text;
 using System.Xml;
-using SixLabors.ImageSharp;
-using SixLabors.ImageSharp.Formats;
-using SixLabors.ImageSharp.PixelFormats;
+using SkiaSharp;
 
 using BitmapDescription = nanoFramework.Tools.ProcessResourceFiles.NanoResourceFile.CLR_GFX_BitmapDescription;
 
@@ -213,7 +211,7 @@ namespace nanoFramework.Tools
 
     /// <summary>
     /// Cross-platform bitmap handling for the nanoFramework resource pipeline,
-    /// backed by ImageSharp. Mirrors the .NET Framework / GDI+ behaviour:
+    /// backed by SkiaSharp. Mirrors the .NET Framework / GDI+ behaviour:
     /// BMP images are converted to uncompressed 16bpp RGB565; JPEG and GIF
     /// images are stored as-is with the matching bitmap type.
     /// </summary>
@@ -227,19 +225,25 @@ namespace nanoFramework.Tools
         /// </summary>
         internal static bool IsSupportedBitmap(byte[] rawValue)
         {
-            return TryGetBitmapType(rawValue, out _);
+            using (SKCodec codec = CreateCodec(rawValue))
+            {
+                return TryGetBitmapType(codec, out _);
+            }
         }
 
         internal static byte[] GenerateBitmapResourceData(byte[] rawValue)
         {
-            if (!TryGetBitmapType(rawValue, out byte bitmapType))
+            using (SKCodec codec = CreateCodec(rawValue))
             {
-                throw new NotSupportedException("Bitmap format not supported.");
-            }
+                if (!TryGetBitmapType(codec, out byte bitmapType))
+                {
+                    throw new NotSupportedException("Bitmap format not supported.");
+                }
 
-            using (Image<Rgba32> image = Image.Load<Rgba32>(rawValue))
-            {
-                if (image.Width > 0xFFFF || image.Height > 0xFFFF)
+                int width = codec.Info.Width;
+                int height = codec.Info.Height;
+
+                if (width > 0xFFFF || height > 0xFFFF)
                 {
                     throw new ArgumentException("bitmap dimensions out of range");
                 }
@@ -250,10 +254,10 @@ namespace nanoFramework.Tools
                 if (bitmapType == BitmapDescription.c_TypeBitmap)
                 {
                     // BMP -> uncompressed 16bpp RGB565.
-                    data = ConvertToRgb565(image);
+                    data = ConvertToRgb565(codec);
                     description = new BitmapDescription(
-                        (ushort)image.Width,
-                        (ushort)image.Height,
+                        (ushort)width,
+                        (ushort)height,
                         0,
                         16,
                         BitmapDescription.c_TypeBitmap);
@@ -263,8 +267,8 @@ namespace nanoFramework.Tools
                     // JPEG / GIF -> stored encoded, decoded by the device at runtime.
                     data = rawValue;
                     description = new BitmapDescription(
-                        (ushort)image.Width,
-                        (ushort)image.Height,
+                        (ushort)width,
+                        (ushort)height,
                         0,
                         1,
                         bitmapType);
@@ -281,41 +285,43 @@ namespace nanoFramework.Tools
             }
         }
 
-        private static bool TryGetBitmapType(byte[] rawValue, out byte bitmapType)
+        /// <summary>
+        /// Creates a codec for the raw bytes, or returns null when they are empty or
+        /// not in an image format SkiaSharp recognises.
+        /// </summary>
+        private static SKCodec CreateCodec(byte[] rawValue)
+        {
+            if (rawValue == null || rawValue.Length == 0)
+            {
+                return null;
+            }
+
+            // The codec takes ownership of the stream and disposes it.
+            return SKCodec.Create(new MemoryStream(rawValue, writable: false));
+        }
+
+        private static bool TryGetBitmapType(SKCodec codec, out byte bitmapType)
         {
             bitmapType = 0;
 
-            if (rawValue == null || rawValue.Length == 0)
+            if (codec == null)
             {
                 return false;
             }
 
-            try
+            switch (codec.EncodedFormat)
             {
-                IImageFormat format = Image.DetectFormat(rawValue);
-                if (format == null)
-                {
+                case SKEncodedImageFormat.Bmp:
+                    bitmapType = BitmapDescription.c_TypeBitmap;
+                    return true;
+                case SKEncodedImageFormat.Gif:
+                    bitmapType = BitmapDescription.c_TypeGif;
+                    return true;
+                case SKEncodedImageFormat.Jpeg:
+                    bitmapType = BitmapDescription.c_TypeJpeg;
+                    return true;
+                default:
                     return false;
-                }
-
-                switch (format.Name.ToUpperInvariant())
-                {
-                    case "BMP":
-                        bitmapType = BitmapDescription.c_TypeBitmap;
-                        return true;
-                    case "GIF":
-                        bitmapType = BitmapDescription.c_TypeGif;
-                        return true;
-                    case "JPEG":
-                        bitmapType = BitmapDescription.c_TypeJpeg;
-                        return true;
-                    default:
-                        return false;
-                }
-            }
-            catch
-            {
-                return false;
             }
         }
 
@@ -324,21 +330,36 @@ namespace nanoFramework.Tools
         /// little-endian per pixel — the layout the nanoCLR expects (and that
         /// GDI+ Format16bppRgb565 produces for even widths).
         /// </summary>
-        private static byte[] ConvertToRgb565(Image<Rgba32> image)
+        private static byte[] ConvertToRgb565(SKCodec codec)
         {
-            int width = image.Width;
-            int height = image.Height;
-            byte[] data = new byte[width * height * 2];
+            int width = codec.Info.Width;
+            int height = codec.Info.Height;
 
-            image.ProcessPixelRows(accessor =>
+            // Decode to straight (unpremultiplied) RGBA with no colour-space
+            // conversion, so channel values are the raw ones stored in the file.
+            SKImageInfo info = new SKImageInfo(width, height, SKColorType.Rgba8888, SKAlphaType.Unpremul);
+
+            using (SKBitmap bitmap = new SKBitmap(info))
             {
+                SKCodecResult result = codec.GetPixels(info, bitmap.GetPixels());
+                if (result != SKCodecResult.Success)
+                {
+                    throw new ArgumentException($"bitmap could not be decoded ({result})");
+                }
+
+                ReadOnlySpan<byte> pixels = bitmap.GetPixelSpan();
+                int rowBytes = bitmap.RowBytes;
+                byte[] data = new byte[width * height * 2];
                 int offset = 0;
+
                 for (int y = 0; y < height; y++)
                 {
-                    Span<Rgba32> row = accessor.GetRowSpan(y);
+                    ReadOnlySpan<byte> row = pixels.Slice(y * rowBytes, width * 4);
                     for (int x = 0; x < width; x++)
                     {
-                        Rgba32 p = row[x];
+                        byte red = row[x * 4];
+                        byte green = row[(x * 4) + 1];
+                        byte blue = row[(x * 4) + 2];
 
                         // Quantize 8-bit channels to RGB565. Green/blue match GDI+
                         // (the net472 System.Drawing path) exactly. Red uses round-to-
@@ -347,18 +368,18 @@ namespace nanoFramework.Tools
                         // dithering by pixel position, which is NOT reproduced here. Such
                         // pixels can differ by 1 LSB of red from the legacy/net472 output.
                         // See SmokeTest Resources.resx parity notes.
-                        int r5 = Math.Min(31, (p.R + 4) >> 3);
-                        int g6 = p.G >> 2;
-                        int b5 = Math.Min(31, (p.B + 4) >> 3);
+                        int r5 = Math.Min(31, (red + 4) >> 3);
+                        int g6 = green >> 2;
+                        int b5 = Math.Min(31, (blue + 4) >> 3);
 
                         ushort value = (ushort)((r5 << 11) | (g6 << 5) | b5);
                         data[offset++] = (byte)(value & 0xFF);
                         data[offset++] = (byte)(value >> 8);
                     }
                 }
-            });
 
-            return data;
+                return data;
+            }
         }
     }
 }

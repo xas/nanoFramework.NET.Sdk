@@ -17,7 +17,7 @@ namespace nanoFramework.Tools.BuildTasks.Tests
 {
     /// <summary>
     /// Unit tests for <see cref="NanoResxResourceReader"/>, the cross-platform
-    /// (net8.0+) .resx parser used in place of
+    /// (net10.0+) .resx parser used in place of
     /// <c>System.Resources.ResXResourceReader</c> (WinForms / net472 only).
     /// </summary>
     [TestClass]
@@ -148,7 +148,7 @@ namespace nanoFramework.Tools.BuildTasks.Tests
         [TestMethod]
         public void Parse_UnsupportedMimetype_ThrowsNotSupportedException()
         {
-            Assert.ThrowsException<NotSupportedException>(() =>
+            Assert.ThrowsExactly<NotSupportedException>(() =>
             {
                 using var reader = ParseResx(@"
   <data name=""Obj"" mimetype=""application/x-microsoft.net.object.binary.base64"">
@@ -187,7 +187,7 @@ namespace nanoFramework.Tools.BuildTasks.Tests
             }
         }
 
-        [DataTestMethod]
+        [TestMethod]
         [DataRow("System.Drawing.Bitmap, System.Drawing, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a")]
         [DataRow("System.IO.MemoryStream, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089")]
         public void Parse_FileRef_NonStringDeclaredType_ReturnsByteArray(string declaredType)
@@ -277,7 +277,7 @@ namespace nanoFramework.Tools.BuildTasks.Tests
         public void Parse_UnsupportedType_ThrowsNotSupportedException()
         {
             // A resource with an explicit non-file-ref, non-string type is unsupported.
-            Assert.ThrowsException<NotSupportedException>(() =>
+            Assert.ThrowsExactly<NotSupportedException>(() =>
             {
                 using var reader = ParseResx(@"
   <data name=""Icon"" type=""System.Drawing.Icon, System.Drawing"">

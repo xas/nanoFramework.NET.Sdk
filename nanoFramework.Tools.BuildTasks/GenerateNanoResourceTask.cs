@@ -208,7 +208,7 @@ namespace nanoFramework.Tools
     /// files referenced by each .resx and their timestamps). It is serialized with
     /// a simple, self-describing binary format so it works identically on .NET
     /// Framework and modern .NET (the previous BinaryFormatter-based format is not
-    /// available on net8.0+). A corrupt or out-of-date cache is never fatal: callers
+    /// available on net10.0+). A corrupt or out-of-date cache is never fatal: callers
     /// fall back to a fresh cache, so the format/version can change freely.
     /// </remarks>
     internal abstract class StateFileBase
@@ -309,7 +309,7 @@ namespace nanoFramework.Tools
         {
             try
             {
-                if (stateFile != null && 
+                if (stateFile != null &&
                     stateFile.Length > 0 &&
                     File.Exists(stateFile))
                 {
@@ -760,13 +760,13 @@ namespace nanoFramework.Tools
         ///  assembly is referenced by the .resx.
         /// </summary>
         public bool NeverLockTypeAssemblies { get; set; }
-        
+
 
         #endregion
 
         public override bool Execute()
         {
-            // report to VS output window what step the build is 
+            // report to VS output window what step the build is
             Log.LogMessage(MessageImportance.Normal, "Generating nanoResources nanoFramework assembly...");
 
             // wait for debugger on var
@@ -778,7 +778,7 @@ namespace nanoFramework.Tools
                 if ((Sources == null) || (Sources.Length == 0))
                 {
                     Log.LogMessage(MessageImportance.Low, "GenerateResource.NoSources");
-                    
+
                     // Indicate we generated nothing
                     OutputResources = null;
 

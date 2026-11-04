@@ -10,7 +10,7 @@
 // **   nf-Visual-Studio-extension / Tools.BuildTasks-2019 /                   **
 // **   ProcessResourceFiles.cs                                                 **
 // **                                                                           **
-// ** This copy adds #if NETFRAMEWORK guards for cross-platform (net8.0+)      **
+// ** This copy adds #if NETFRAMEWORK guards for cross-platform (net10.0+)      **
 // ** support. Any logic change made here MUST be ported there, and vice-versa.**
 // ******************************************************************************
 
