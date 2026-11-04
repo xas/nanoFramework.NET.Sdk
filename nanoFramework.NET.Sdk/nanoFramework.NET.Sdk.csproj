@@ -138,4 +138,17 @@
     <None Include="..\README.md" Pack="true" PackagePath="" />
   </ItemGroup>
 
+  <!--
+    Fixed package version for local smoke tests (test/SmokeTest/Run-SmokeTest.ps1).
+    Nerdbank.GitVersioning sets PackageVersion through a task output, which wins even over
+    -p:PackageVersion, so the override is applied right after its GetBuildVersion target.
+  -->
+  <Target Name="_NanoOverridePackageVersion"
+          AfterTargets="GetBuildVersion"
+          Condition="'$(NanoSdkPackageVersion)' != ''">
+    <PropertyGroup>
+      <PackageVersion>$(NanoSdkPackageVersion)</PackageVersion>
+    </PropertyGroup>
+  </Target>
+
 </Project>

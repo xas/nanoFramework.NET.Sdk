@@ -16,14 +16,15 @@ The test project targets both `net10.0` and `net472`. Run the `net472` target on
 dotnet test test\BuildTasks.Tests\BuildTasks.Tests.csproj -f net472
 ```
 
-For an SDK-package smoke test, pack the SDK first, then build the sample project:
+For an SDK-package smoke test, run the script. It packs the SDK from this checkout with the fixed dev version pinned in `test\SmokeTest\global.json` (`1.1.0-dev`) into `artifacts\smoketest`, drops the NuGet-cached copy of that version, then builds the sample project:
 
 ```powershell
-dotnet pack nanoFramework.NET.Sdk\nanoFramework.NET.Sdk.csproj -c Release
-dotnet build test\SmokeTest\SmokeTest.csproj -c Debug
+pwsh test\SmokeTest\Run-SmokeTest.ps1 -Configuration Debug
 ```
 
-`test\SmokeTest\Verify-Parity.ps1` compares generated `.nanoresources` files from `dotnet`/`net10.0` and Visual Studio MSBuild/`net472`; it requires Windows MSBuild.
+`test\SmokeTest\NuGet.Config` maps `nanoFramework.NET.Sdk` to the local feed only, so a plain `dotnet build test\SmokeTest\SmokeTest.csproj` never falls back to a published package; it fails until the script has packed the SDK.
+
+`test\SmokeTest\Verify-Parity.ps1` (run after `Run-SmokeTest.ps1`) compares generated `.nanoresources` files from `dotnet`/`net10.0` and Visual Studio MSBuild/`net472`; it requires Windows MSBuild.
 
 ## Architecture
 
