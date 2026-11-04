@@ -3,14 +3,6 @@
 // See LICENSE file in the project root for full license information.
 //
 
-// ProcessResourceFiles has a field of type TaskLoggingHelper
-// (Microsoft.Build.Utilities.Core). On net10.0 that NuGet package ships only a
-// reference assembly (no runtime lib), so instantiating ProcessResourceFiles fails
-// at test-run time. The cross-platform components it exercises on net10.0
-// (NanoResxResourceReader, CrossPlatformBitmap) are covered directly by the other
-// test files. These integration tests therefore run on net472 only.
-#if NETFRAMEWORK
-
 using System;
 using System.IO;
 using System.Text;
@@ -25,10 +17,9 @@ namespace nanoFramework.Tools.BuildTasks.Tests
     /// .nanoresources binary output.
     ///
     /// These tests use the public <c>ReadResources</c> / <c>WriteResources</c> API
-    /// rather than <c>Run()</c> so that the test project has no runtime dependency on
-    /// <c>Microsoft.Build.Utilities.Core</c> (whose assembly is not on the default
-    /// probe path when running <c>dotnet test</c>). This file is compiled and run only
-    /// for NETFRAMEWORK (net472).
+    /// rather than <c>Run()</c>, so no MSBuild host is needed. They run on both
+    /// targets: net472 exercises the System.Drawing / WinForms path, net10.0 the
+    /// cross-platform path (NanoResxResourceReader, CrossPlatformBitmap).
     /// </summary>
     [TestClass]
     public class ProcessResourceFilesTests
@@ -435,5 +426,3 @@ namespace nanoFramework.Tools.BuildTasks.Tests
         }
     }
 }
-
-#endif

@@ -10,7 +10,7 @@ dotnet test test\BuildTasks.Tests\BuildTasks.Tests.csproj -f net10.0
 dotnet test test\BuildTasks.Tests\BuildTasks.Tests.csproj -f net10.0 --filter "FullyQualifiedName~nanoFramework.Tools.BuildTasks.Tests.Rgb565ConversionTests.Convert_PureRed_YieldsExpectedValue"
 ```
 
-The test project targets both `net10.0` and `net472`. Run the `net472` target on Windows to exercise the full-framework resource-processing integration tests:
+The test project targets `net10.0`, plus `net472` on Windows only (elsewhere vstest would need mono). Run the `net472` target on Windows to exercise the full-framework (System.Drawing / WinForms) resource-processing path:
 
 ```powershell
 dotnet test test\BuildTasks.Tests\BuildTasks.Tests.csproj -f net472
@@ -31,7 +31,7 @@ pwsh test\SmokeTest\Run-SmokeTest.ps1 -Configuration Debug
 - `nanoFramework.NET.Sdk` is a packaging project, not the SDK implementation in C#. It packages the `Sdk` props/targets plus the custom task assemblies from `nanoFramework.Tools.BuildTasks` for `net10.0` (dotnet MSBuild) and `net472` (Visual Studio MSBuild).
 - `Sdk\Sdk.props` imports `Microsoft.NET.Sdk` and then `nanoFramework.Tfm.props`, which establishes `netnano1.0` and prevents standard framework references from leaking into nanoFramework compilation. `Sdk\Sdk.targets` imports the Microsoft targets and then the focused modules in dependency order: MDP, resources, output, and Visual Studio CPS/debugger capabilities.
 - The main build pipeline compiles managed IL first, then `nanoFramework.Mdp.targets` invokes MetadataProcessor after `CoreCompile` to produce the nanoFramework `.pe` and `.pdbx`. `nanoFramework.Resources.targets` removes `.resx` items from the standard resource pipeline and generates `.nanoresources` for MetadataProcessor. `nanoFramework.Output.targets` generates deployable output, copies artifacts, reports the native checksum, and handles cleanup.
-- Build tasks target `net10.0;net472`. The modern .NET resource path uses the cross-platform implementations in `ProcessResourceFiles.CrossPlatform.cs` (SkiaSharp and CodeDom); the .NET Framework path uses `System.Drawing`/WinForms. Tests are guarded by target: parser/bitmap tests run on `net10.0`, while `ProcessResourceFilesTests` runs on `net472`.
+- Build tasks target `net10.0;net472`. The modern .NET resource path uses the cross-platform implementations in `ProcessResourceFiles.CrossPlatform.cs` (SkiaSharp and CodeDom); the .NET Framework path uses `System.Drawing`/WinForms. Tests are guarded by target: parser/bitmap unit tests run on `net10.0`, while the `ProcessResourceFilesTests` integration tests run on both targets, one per resource path.
 
 ## Repository-specific conventions
 

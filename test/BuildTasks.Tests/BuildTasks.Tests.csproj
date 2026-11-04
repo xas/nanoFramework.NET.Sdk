@@ -18,23 +18,19 @@
     <PackageReference Include="MSTest.TestFramework" Version="4.5.2" />
     <!-- Microsoft.Build.Framework provides ITaskItem, IBuildEngine used in test infrastructure -->
     <PackageReference Include="Microsoft.Build.Framework" Version="18.0.2" />
+    <!-- Runtime lib for ProcessResourceFiles (TaskLoggingHelper field); the build task
+         itself references it compile-only, since MSBuild provides it at build time -->
+    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\..\nanoFramework.Tools.BuildTasks\nanoFramework.Tools.BuildTasks.csproj" />
   </ItemGroup>
 
-  <!--
-    net472 needs:
-      - Windows-only framework refs (same as the BuildTasks project)
-      - Microsoft.Build.Utilities.Core at runtime (provides the runtime lib for net472;
-        the net10.0 NuGet variant ships only a reference assembly, so ProcessResourceFilesTests
-        is guarded with #if NETFRAMEWORK and skipped on net10.0)
-  -->
+  <!-- net472 needs the Windows-only framework refs (same as the BuildTasks project) -->
   <ItemGroup Condition="'$(TargetFramework)' == 'net472'">
     <Reference Include="System.Drawing" />
     <Reference Include="System.Windows.Forms" />
-    <PackageReference Include="Microsoft.Build.Utilities.Core" Version="18.0.2" />
   </ItemGroup>
 
 </Project>
