@@ -74,8 +74,16 @@
           nanoFramework.Tools.BuildTasks.dll
         net10.0/
           nanoFramework.Tools.BuildTasks.dll
+          nanoFramework.Tools.BuildTasks.deps.json
+          SkiaSharp.dll
+          System.CodeDom.dll
+          runtimes/<rid>/native/libSkiaSharp.*
       README.md
   -->
+  <PropertyGroup>
+    <_NanoSkiaNativeDir>..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\runtimes\</_NanoSkiaNativeDir>
+  </PropertyGroup>
+
   <ItemGroup>
     <None Include="..\assets\nf-logo.png">
       <Pack>True</Pack>
@@ -108,9 +116,23 @@
     <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\nanoFramework.Tools.BuildTasks.dll" Pack="true" PackagePath="tasks\net10.0" />
     <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\nanoFramework.Tools.BuildTasks.pdb" Pack="true" PackagePath="tasks\net10.0" Condition="Exists('..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\nanoFramework.Tools.BuildTasks.pdb')" />
 
-    <!-- Cross-platform resource-processing dependencies, loaded alongside the net10.0 task DLL -->
-    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\SixLabors.ImageSharp.dll" Pack="true" PackagePath="tasks\net10.0" />
+    <!-- Cross-platform resource-processing dependencies, loaded alongside the net10.0 task DLL.
+         The .deps.json lets MSBuild resolve the SkiaSharp native library for the host RID. -->
+    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\nanoFramework.Tools.BuildTasks.deps.json" Pack="true" PackagePath="tasks\net10.0" />
+    <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\SkiaSharp.dll" Pack="true" PackagePath="tasks\net10.0" />
     <None Include="..\nanoFramework.Tools.BuildTasks\bin\$(Configuration)\net10.0\System.CodeDom.dll" Pack="true" PackagePath="tasks\net10.0" />
+
+    <!-- SkiaSharp native libraries, only for the platforms the .NET SDK itself runs on
+         (no native .pdb files, no mobile or exotic RIDs, to keep the package small) -->
+    <None Include="$(_NanoSkiaNativeDir)win-x64\native\libSkiaSharp.dll" Pack="true" PackagePath="tasks\net10.0\runtimes\win-x64\native" />
+    <None Include="$(_NanoSkiaNativeDir)win-x86\native\libSkiaSharp.dll" Pack="true" PackagePath="tasks\net10.0\runtimes\win-x86\native" />
+    <None Include="$(_NanoSkiaNativeDir)win-arm64\native\libSkiaSharp.dll" Pack="true" PackagePath="tasks\net10.0\runtimes\win-arm64\native" />
+    <None Include="$(_NanoSkiaNativeDir)osx\native\libSkiaSharp.dylib" Pack="true" PackagePath="tasks\net10.0\runtimes\osx\native" />
+    <None Include="$(_NanoSkiaNativeDir)linux-x64\native\libSkiaSharp.so" Pack="true" PackagePath="tasks\net10.0\runtimes\linux-x64\native" />
+    <None Include="$(_NanoSkiaNativeDir)linux-arm64\native\libSkiaSharp.so" Pack="true" PackagePath="tasks\net10.0\runtimes\linux-arm64\native" />
+    <None Include="$(_NanoSkiaNativeDir)linux-arm\native\libSkiaSharp.so" Pack="true" PackagePath="tasks\net10.0\runtimes\linux-arm\native" />
+    <None Include="$(_NanoSkiaNativeDir)linux-musl-x64\native\libSkiaSharp.so" Pack="true" PackagePath="tasks\net10.0\runtimes\linux-musl-x64\native" />
+    <None Include="$(_NanoSkiaNativeDir)linux-musl-arm64\native\libSkiaSharp.so" Pack="true" PackagePath="tasks\net10.0\runtimes\linux-musl-arm64\native" />
 
     <!-- Package README -->
     <None Include="..\README.md" Pack="true" PackagePath="" />

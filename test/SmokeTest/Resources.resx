@@ -6,7 +6,7 @@
 
   NOTE on the bitmap: logo.bmp deliberately uses only fully-saturated channel values
   (0 / 255). GDI+ (the net472 System.Drawing path) applies ordered (Bayer) dithering
-  when quantizing 24bpp -> 16bpp RGB565, while the net10.0 ImageSharp path does flat
+  when quantizing 24bpp -> 16bpp RGB565, while the net10.0 SkiaSharp path does flat
   round-to-nearest. Colors that land exactly on a 5/6-bit half-level boundary would
   therefore differ by 1 LSB between the two builds. Pure 0/255 colors quantize exactly
   on both paths, keeping this a strict byte-parity gate. See

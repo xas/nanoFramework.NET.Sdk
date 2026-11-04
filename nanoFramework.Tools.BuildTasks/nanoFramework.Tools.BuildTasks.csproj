@@ -35,18 +35,22 @@
   <!--
     On modern .NET the GDI+ / WinForms dependencies are unavailable, so the resource
     pipeline uses cross-platform equivalents (see ProcessResourceFiles.CrossPlatform.cs):
-      * SixLabors.ImageSharp for bitmap decoding / RGB565 conversion
+      * SkiaSharp for bitmap decoding / RGB565 conversion (native assets for Windows,
+        macOS and Linux; the Linux NoDependencies flavor avoids a fontconfig requirement)
       * System.CodeDom for strongly-typed resource class generation
   -->
   <ItemGroup Condition="'$(TargetFramework)' != 'net472'">
-    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.11" />
+    <PackageReference Include="SkiaSharp" Version="4.154.0" />
+    <PackageReference Include="SkiaSharp.NativeAssets.Linux.NoDependencies" Version="4.154.0" />
     <PackageReference Include="System.CodeDom" Version="10.0.14" />
   </ItemGroup>
 
   <!--
     The build task is loaded by MSBuild from the SDK package's tasks\ folder, so its
-    NuGet dependencies (ImageSharp, System.CodeDom) must sit next to the task DLL.
-    Copy them to the output so the packaging project can ship them.
+    NuGet dependencies (SkiaSharp, System.CodeDom) must sit next to the task DLL.
+    Copy them to the output so the packaging project can ship them. SkiaSharp's native
+    libraries land in runtimes\<rid>\native\ and are resolved by MSBuild through the
+    task's .deps.json.
   -->
   <PropertyGroup Condition="'$(TargetFramework)' != 'net472'">
     <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
